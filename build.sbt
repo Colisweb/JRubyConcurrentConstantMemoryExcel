@@ -1,4 +1,4 @@
-ThisBuild / organization := "com.colisweb"
+ThisBuild / organization := "com.guizmaii"
 ThisBuild / scalaVersion := "2.12.7"
 ThisBuild / scalafmtOnCompile := true
 ThisBuild / scalafmtCheck := true
@@ -34,6 +34,29 @@ def noPublishSettings = Seq(
   publish := {},
   publishLocal := {},
   publishArtifact := false
+)
+
+inThisBuild(
+  List(
+    credentials += Credentials(Path.userHome / ".bintray" / ".credentials"),
+    licenses := Seq("MIT" -> url("http://opensource.org/licenses/MIT")),
+    homepage := Some(url("https://github.com/guizmaii/easy_excel_jruby")),
+    bintrayOrganization := Some("guizmaii"),
+    bintrayReleaseOnPublish := true,
+    publishMavenStyle := true,
+    pomExtra := (
+      <scm>
+        <url>git@github.com:guizmaii/easy_excel_jruby.git</url>
+        <connection>scm:git:git@github.com:guizmaii/easy_excel_jruby.git</connection>
+      </scm>
+        <developers>
+          <developer>
+            <id>guizmaii</id>
+            <name>Jules Ivanic</name>
+          </developer>
+        </developers>
+      )
+  )
 )
 
 //// Aliases
