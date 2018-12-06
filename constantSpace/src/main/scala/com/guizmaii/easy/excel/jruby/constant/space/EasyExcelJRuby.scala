@@ -15,6 +15,13 @@ object Types {
   private[space] final val STRING_CELL  = "s"
   private[space] final val NUMERIC_CELL = "n"
 
+  private[space] final val headerStyle =
+    CellStyle(
+      fillPattern = CellFill.None,
+      fillForegroundColor = Color.White,
+      font = Font(bold = true)
+    )
+
   final case class Page private[space] (name: String, path: String)
 
   private[space] object Page {
@@ -51,13 +58,6 @@ object EasyExcelJRuby {
   import com.guizmaii.easy.excel.jruby.constant.space.utils.KantanExtension._
   import kantan.csv._
   import kantan.csv.ops._
-
-  private[space] final val headerStyle =
-    CellStyle(
-      fillPattern = CellFill.None,
-      fillForegroundColor = Color.White,
-      font = Font(bold = true)
-    )
 
   final val blankCell: Cell = Cell.BlankCell
 
