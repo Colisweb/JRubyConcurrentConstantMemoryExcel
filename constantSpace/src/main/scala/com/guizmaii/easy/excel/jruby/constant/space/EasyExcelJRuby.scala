@@ -11,9 +11,9 @@ import scala.collection.immutable.SortedSet
 
 object Types {
 
-  private[space] final val BLANK_CELL   = "b"
-  private[space] final val STRING_CELL  = "s"
-  private[space] final val NUMERIC_CELL = "n"
+  private[space] final val BLANK_CELL   = 'b'
+  private[space] final val STRING_CELL  = 's'
+  private[space] final val NUMERIC_CELL = 'n'
 
   private[space] final val headerStyle =
     CellStyle(

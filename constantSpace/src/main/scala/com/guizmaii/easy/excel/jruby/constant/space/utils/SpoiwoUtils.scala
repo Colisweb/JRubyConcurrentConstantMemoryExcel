@@ -4,6 +4,8 @@ import com.guizmaii.easy.excel.jruby.constant.space.Types
 import com.norbitltd.spoiwo.model.{Cell => SpoiwoCell, Row => SpoiwoRow}
 import kantan.csv.{CellDecoder, RowDecoder}
 
+import scala.annotation.switch
+
 private[space] object SpoiwoUtils {
 
   final val blankCell = SpoiwoCell.Empty
@@ -15,7 +17,7 @@ private[space] object SpoiwoUtils {
   private final val spoiwoCellDecoder: CellDecoder[SpoiwoCell] =
     CellDecoder.fromUnsafe { s =>
       val Array(cellType, data) = s.split(":", 2)
-      cellType match {
+      (cellType(0): @switch) match {
         case Types.BLANK_CELL   => SpoiwoUtils.blankCell
         case Types.STRING_CELL  => SpoiwoUtils.stringCell(data)
         case Types.NUMERIC_CELL => SpoiwoUtils.numericCell(data.toDouble)
