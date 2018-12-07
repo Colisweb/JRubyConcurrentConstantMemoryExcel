@@ -10,13 +10,6 @@ lazy val testKitLibs = Seq(
   "org.scalatest"  %% "scalatest"  % "3.0.5",
 ).map(_ % Test)
 
-lazy val kantanCSV =
-  ((version: String) =>
-    Seq(
-      "com.nrinaudo" %% "kantan.csv"         % version,
-      "com.nrinaudo" %% "kantan.csv-generic" % version
-    ))("0.5.0")
-
 lazy val root =
   Project(id = "easy_excel_jruby", base = file("."))
     .settings(moduleName := "root")
@@ -38,8 +31,9 @@ lazy val constantSpace =
     .settings(moduleName := "easy_excel_jruby_constant_space")
     .settings(
       libraryDependencies ++= Seq(
-        "com.norbitltd" %% "spoiwo"     % "1.4.1",
-      ) ++ kantanCSV ++ testKitLibs
+        "com.norbitltd" %% "spoiwo" % "1.4.1",
+        "com.nrinaudo" %% "kantan.csv" % "0.5.0"
+      ) ++ testKitLibs
     )
 
 /**
