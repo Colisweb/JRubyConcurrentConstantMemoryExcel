@@ -28,10 +28,10 @@ object EasyExcelJRuby {
       pages = SortedSet.empty
     )
 
-  final def addRows(sheet: ConstantMemorySheet, page: Array[Row], pageIndex: Int): ConstantMemorySheet = {
+  final def addRows(sheet: ConstantMemorySheet, page_data: Array[Row], pageIndex: Int): ConstantMemorySheet = {
     val fileName = tmpFileName(sheet, pageIndex)
     val file     = java.io.File.createTempFile(fileName, "csv")
-    file.writeCsv[Row](page, rfc)
+    file.writeCsv[Row](page_data, rfc)
 
     sheet.copy(pages = sheet.pages + Page(fileName, file.getAbsolutePath))
   }
