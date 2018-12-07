@@ -2,7 +2,7 @@ package com.guizmaii.easy.excel.jruby.constant.space.utils
 
 import kantan.csv.{CellDecoder, CellEncoder, RowDecoder, RowEncoder}
 
-import scala.collection.mutable.ArrayBuffer
+import scala.collection.mutable.ListBuffer
 import scala.reflect.ClassTag
 
 private[space] object KantanExtension {
@@ -16,7 +16,7 @@ private[space] object KantanExtension {
       implicit CellDecoder: CellDecoder[A]
   ): RowDecoder[Array[A]] =
     RowDecoder.fromUnsafe { array =>
-      val acc = ArrayBuffer.empty[A]
+      val acc = ListBuffer.empty[A]
       for (a <- array) acc += CellDecoder.unsafeDecode(a)
       acc.toArray
     }
