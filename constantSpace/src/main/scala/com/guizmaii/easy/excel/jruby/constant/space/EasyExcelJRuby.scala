@@ -10,7 +10,7 @@ import scala.collection.immutable.SortedSet
 
 object EasyExcelJRuby {
 
-  import Types._
+  import types._
   import com.guizmaii.easy.excel.jruby.constant.space.utils.KantanExtension._
   import kantan.csv._
   import kantan.csv.ops._

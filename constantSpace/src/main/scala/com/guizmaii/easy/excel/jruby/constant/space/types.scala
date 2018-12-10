@@ -9,7 +9,7 @@ import kantan.csv.CellEncoder
 
 import scala.collection.immutable.SortedSet
 
-object Types {
+object types {
 
   private[space] final val BLANK_CELL   = 'b'
   private[space] final val STRING_CELL  = 's'
