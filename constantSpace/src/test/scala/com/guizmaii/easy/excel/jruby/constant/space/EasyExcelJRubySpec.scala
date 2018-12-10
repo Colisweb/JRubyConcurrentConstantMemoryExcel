@@ -19,7 +19,7 @@ class EasyExcelJRubySpec extends FlatSpec with Matchers {
   val headers    = Array("A", "B", "C")
 
   // Ugly but handy. Don't abuse of that !
-  implicit final def toCell(value: String): Cell = stringCell(value)
+  implicit final def toCell(value: String): Cell = if (value.isEmpty) blankCell else stringCell(value)
   implicit final def toCell(value: Double): Cell = numericCell(value)
 
   def newSheetPlz: ConstantMemorySheet = newSheet(sheet_name, headers)
@@ -56,9 +56,9 @@ class EasyExcelJRubySpec extends FlatSpec with Matchers {
     )
 
     val data2: Array[Row] = Array(
-      row("a02", "b02", 20),
-      row("a12", "b12", 21),
-      row("a22", "b22", 22),
+      row("a02", "", 20),
+      row("a12", "", 21),
+      row("a22", "", 22),
     )
 
     sheet = addRows(sheet, data2, 10)
@@ -90,9 +90,9 @@ class EasyExcelJRubySpec extends FlatSpec with Matchers {
     )
 
     val data2: Array[Row] = Array(
-      row("a02", "b02", 20),
-      row("a12", "b12", 21),
-      row("a22", "b22", 22),
+      row("a02", "", 20),
+      row("a12", "", 21),
+      row("a22", "", 22),
     )
 
     sheet = addRows(sheet, data2, 0)
