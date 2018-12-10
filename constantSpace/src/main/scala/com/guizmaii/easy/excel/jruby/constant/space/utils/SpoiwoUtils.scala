@@ -1,6 +1,6 @@
 package com.guizmaii.easy.excel.jruby.constant.space.utils
 
-import com.guizmaii.easy.excel.jruby.constant.space.types
+import com.guizmaii.easy.excel.jruby.constant.space.Types
 import com.norbitltd.spoiwo.model.{Cell => SpoiwoCell, Row => SpoiwoRow}
 import kantan.csv.{CellDecoder, RowDecoder}
 
@@ -18,9 +18,9 @@ private[space] object SpoiwoUtils {
     CellDecoder.fromUnsafe { s =>
       val Array(cellType, data) = s.split(":", 2)
       (cellType(0): @switch) match {
-        case types.BLANK_CELL   => SpoiwoUtils.blankCell
-        case types.STRING_CELL  => SpoiwoUtils.stringCell(data)
-        case types.NUMERIC_CELL => SpoiwoUtils.numericCell(data.toDouble)
+        case Types.BLANK_CELL   => SpoiwoUtils.blankCell
+        case Types.STRING_CELL  => SpoiwoUtils.stringCell(data)
+        case Types.NUMERIC_CELL => SpoiwoUtils.numericCell(data.toDouble)
       }
     }
 
