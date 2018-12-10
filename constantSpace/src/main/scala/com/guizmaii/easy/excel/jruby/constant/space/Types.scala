@@ -36,7 +36,7 @@ object Types {
   )
 
   // Thanks to Nicolas Rinaudo (@NicolasRinaudo) for this piece of code.
-  sealed abstract class Cell extends Product with Serializable
+  sealed trait Cell
   private[space] object Cell {
     final case object BlankCell                 extends Cell
     final case class StringCell(value: String)  extends Cell
