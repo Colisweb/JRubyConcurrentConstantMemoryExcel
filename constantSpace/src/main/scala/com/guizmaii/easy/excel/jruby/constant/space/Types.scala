@@ -35,6 +35,7 @@ object Types {
       pages: SortedSet[Page]
   )
 
+  // Thanks to Nicolas Rinaudo (@NicolasRinaudo) for this piece of code.
   sealed abstract class Cell extends Product with Serializable
   private[space] object Cell {
     final case object BlankCell                 extends Cell
