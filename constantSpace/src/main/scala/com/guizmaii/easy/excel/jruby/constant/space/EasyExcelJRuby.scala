@@ -1,5 +1,6 @@
 package com.guizmaii.easy.excel.jruby.constant.space
 
+import java.nio.file.Files
 import java.util.UUID
 
 import com.norbitltd.spoiwo.model.{Row => SpoiwoRow, Sheet => SpoiwoSheet}
@@ -24,16 +25,14 @@ object EasyExcelJRuby {
     ConstantMemorySheet(
       name = WorkbookUtil.createSafeSheetName(sheetName),
       header = SpoiwoRow().withCellValues(headerValues.toList).withStyle(headerStyle),
-      tmpFileName = UUID.randomUUID(),
+      tmpDirectory = Files.createTempDirectory(UUID.randomUUID().toString).toFile,
       pages = SortedSet.empty
     )
 
   final def addRows(sheet: ConstantMemorySheet, pageData: Array[Row], pageIndex: Int): ConstantMemorySheet = {
-    val fileName = tmpFileName(sheet, pageIndex)
-    val file     = java.io.File.createTempFile(fileName, "csv")
+    val file = java.io.File.createTempFile(UUID.randomUUID().toString, "csv", sheet.tmpDirectory)
     file.writeCsv[Row](pageData, rfc)
-
-    sheet.copy(pages = sheet.pages + Page(fileName, file.getAbsolutePath))
+    sheet.copy(pages = sheet.pages + Page(pageIndex, file.toPath))
   }
 
   final def writeFile(sheet: ConstantMemorySheet, fileName: String): Unit = {
@@ -45,13 +44,26 @@ object EasyExcelJRuby {
     sheet.pages
       .foreach {
         case Page(_, path) =>
-          val spoiwoRows = new java.io.File(path).unsafeReadCsv[Array, SpoiwoRow](rfc)
+          val spoiwoRows = path.unsafeReadCsv[Array, SpoiwoRow](rfc)
           spoiwoSheet.addRows(spoiwoRows)
       }
 
     spoiwoSheet.saveAsXlsx(fileName)
   }
 
-  private final def tmpFileName(sheet: ConstantMemorySheet, pageIndex: Int): String = s"$pageIndex-${sheet.tmpFileName}"
+  final def clean(sheet: ConstantMemorySheet, swallowIOExceptions: Boolean = false): Unit = {
+    import better.files._ // better-files `delete()` method also works on directories, unlike the Java one.
+    sheet.tmpDirectory.toScala.delete(swallowIOExceptions)
+    ()
+  }
+
+  final def writeFileAndClean(
+      sheet: ConstantMemorySheet,
+      fileName: String,
+      swallowIOExceptions: Boolean = false
+  ): Unit = {
+    writeFile(sheet, fileName)
+    clean(sheet, swallowIOExceptions)
+  }
 
 }

@@ -32,7 +32,8 @@ lazy val constantSpace =
     .settings(
       libraryDependencies ++= Seq(
         "com.norbitltd" %% "spoiwo" % "1.4.1",
-        "com.nrinaudo" %% "kantan.csv" % "0.5.0"
+        "com.nrinaudo" %% "kantan.csv" % "0.5.0",
+        "com.github.pathikrit" %% "better-files" % "3.7.0"
       ) ++ testKitLibs
     )
 
