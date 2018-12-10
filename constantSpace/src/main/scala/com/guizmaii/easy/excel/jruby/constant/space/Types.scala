@@ -3,11 +3,26 @@ package com.guizmaii.easy.excel.jruby.constant.space
 import java.io.File
 import java.nio.file.Path
 
+import com.guizmaii.easy.excel.jruby.constant.space.Types.{BLANK_CELL, NUMERIC_CELL, STRING_CELL}
 import com.norbitltd.spoiwo.model.enums.CellFill
 import com.norbitltd.spoiwo.model.{CellStyle, Color, Font, Row => SpoiwoRow}
 import kantan.csv.CellEncoder
 
 import scala.collection.immutable.SortedSet
+
+// Sadly, it seems that I can't declare this trait in an object if I want to be able to use it in JRuby.
+sealed abstract class Cell extends Product with Serializable
+object Cell {
+  private[space] final case object BlankCell                 extends Cell
+  private[space] final case class StringCell(value: String)  extends Cell
+  private[space] final case class NumericCell(value: Double) extends Cell
+
+  private[space] implicit final val encoder: CellEncoder[Cell] = {
+    case BlankCell          => s"$BLANK_CELL:"
+    case StringCell(value)  => s"$STRING_CELL:$value"
+    case NumericCell(value) => s"$NUMERIC_CELL:$value"
+  }
+}
 
 object Types {
 
@@ -34,20 +49,6 @@ object Types {
       tmpDirectory: File,
       pages: SortedSet[Page]
   )
-
-  // Thanks to Nicolas Rinaudo (@NicolasRinaudo) for this piece of code.
-  sealed trait Cell
-  object Cell {
-    private[space] final case object BlankCell                 extends Cell
-    private[space] final case class StringCell(value: String)  extends Cell
-    private[space] final case class NumericCell(value: Double) extends Cell
-
-    private[space] implicit final val encoder: CellEncoder[Cell] = {
-      case BlankCell          => s"$BLANK_CELL:"
-      case StringCell(value)  => s"$STRING_CELL:$value"
-      case NumericCell(value) => s"$NUMERIC_CELL:$value"
-    }
-  }
 
   private[space] type Row = Array[Cell]
 
