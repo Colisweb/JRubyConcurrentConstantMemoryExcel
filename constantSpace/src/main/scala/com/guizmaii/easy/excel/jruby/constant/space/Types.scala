@@ -37,12 +37,12 @@ object Types {
 
   // Thanks to Nicolas Rinaudo (@NicolasRinaudo) for this piece of code.
   sealed trait Cell
-  private[space] object Cell {
-    final case object BlankCell                 extends Cell
-    final case class StringCell(value: String)  extends Cell
-    final case class NumericCell(value: Double) extends Cell
+  object Cell {
+    private[space] final case object BlankCell                 extends Cell
+    private[space] final case class StringCell(value: String)  extends Cell
+    private[space] final case class NumericCell(value: Double) extends Cell
 
-    implicit final val encoder: CellEncoder[Cell] = {
+    private[space] implicit final val encoder: CellEncoder[Cell] = {
       case BlankCell          => s"$BLANK_CELL:"
       case StringCell(value)  => s"$STRING_CELL:$value"
       case NumericCell(value) => s"$NUMERIC_CELL:$value"
