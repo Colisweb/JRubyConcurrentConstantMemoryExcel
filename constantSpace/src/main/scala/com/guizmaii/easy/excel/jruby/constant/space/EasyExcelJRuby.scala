@@ -36,19 +36,18 @@ object EasyExcelJRuby {
   }
 
   final def writeFile(sheet: ConstantMemorySheet, fileName: String): Unit = {
+    val finalSheet = SpoiwoSheet(name = sheet.name).addRow(sheet.header)
+
     import com.guizmaii.easy.excel.jruby.constant.space.utils.SpoiwoUtils.spoiwoRowDecoder
-    import com.norbitltd.spoiwo.natures.xlsx.Model2XlsxConversions._
-
-    val spoiwoSheet = SpoiwoSheet(name = sheet.name).addRow(sheet.header)
-
     sheet.pages
       .foreach {
         case Page(_, path) =>
           val spoiwoRows = path.unsafeReadCsv[Array, SpoiwoRow](rfc)
-          spoiwoSheet.addRows(spoiwoRows)
+          finalSheet.addRows(spoiwoRows)
       }
 
-    spoiwoSheet.saveAsXlsx(fileName)
+    import com.norbitltd.spoiwo.natures.xlsx.Model2XlsxConversions._
+    finalSheet.saveAsXlsx(fileName)
   }
 
   final def clean(sheet: ConstantMemorySheet, swallowIOExceptions: Boolean = false): Unit = {
