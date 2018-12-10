@@ -36,15 +36,16 @@ object EasyExcelJRuby {
   }
 
   final def writeFile(sheet: ConstantMemorySheet, fileName: String): Unit = {
-    val finalSheet = SpoiwoSheet(name = sheet.name).addRow(sheet.header)
-
     import com.guizmaii.easy.excel.jruby.constant.space.utils.SpoiwoUtils.spoiwoRowDecoder
-    sheet.pages
-      .foreach {
-        case Page(_, path) =>
-          val spoiwoRows = path.unsafeReadCsv[Array, SpoiwoRow](rfc)
-          finalSheet.addRows(spoiwoRows)
-      }
+
+    val zero = SpoiwoSheet(name = sheet.name).addRow(sheet.header)
+    val finalSheet =
+      sheet.pages
+        .foldLeft(zero) {
+          case (sheet, Page(_, path)) =>
+            val spoiwoRows = path.unsafeReadCsv[Array, SpoiwoRow](rfc)
+            sheet.addRows(spoiwoRows)
+        }
 
     import com.norbitltd.spoiwo.natures.xlsx.Model2XlsxConversions._
     finalSheet.saveAsXlsx(fileName)
