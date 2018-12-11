@@ -4,14 +4,23 @@ ThisBuild / scalafmtOnCompile := true
 ThisBuild / scalafmtCheck := true
 ThisBuild / scalafmtSbtCheck := true
 
+lazy val projectName = "ConstantMemoryExcelJRuby"
+
 lazy val testKitLibs = Seq(
   "org.scalacheck" %% "scalacheck" % "1.14.0",
   "org.scalactic"  %% "scalactic"  % "3.0.5",
   "org.scalatest"  %% "scalatest"  % "3.0.5",
 ).map(_ % Test)
 
+lazy val poi =
+  ((version: String) =>
+    Seq(
+      "org.apache.poi" % "poi"       % version,
+      "org.apache.poi" % "poi-ooxml" % version
+    ))("4.0.1")
+
 lazy val root =
-  Project(id = "easy_excel_jruby", base = file("."))
+  Project(id = projectName, base = file("."))
     .settings(moduleName := "root")
     .settings(noPublishSettings: _*)
     .aggregate(core)
@@ -19,19 +28,17 @@ lazy val root =
 
 lazy val core =
   project
-    .settings(moduleName := "easy_excel_jruby")
+    .settings(moduleName := projectName)
     .settings(
       libraryDependencies ++= Seq(
-        "com.norbitltd" %% "spoiwo" % "1.4.1",
         "com.nrinaudo" %% "kantan.csv" % "0.5.0",
         "com.github.pathikrit" %% "better-files" % "3.7.0"
-      ) ++ testKitLibs
-    )
+      ) ++ poi ++ testKitLibs)
 
 /**
   * Copied from Cats
   */
-def noPublishSettings = Seq(
+lazy val noPublishSettings = Seq(
   publish := {},
   publishLocal := {},
   publishArtifact := false

@@ -1,19 +1,20 @@
-package com.guizmaii.easy.excel.jruby.constant.space
+package com.guizmaii.jruby.constant.memory.excel
 
 import java.io.File
 import java.nio.file.Files
 import java.util.Date
 
-import com.guizmaii.easy.excel.jruby.constant.space.Types._
 import org.scalatest.{FlatSpec, Matchers}
 
-class EasyExcelJRubySpec extends FlatSpec with Matchers {
+import scala.collection.mutable.ListBuffer
+
+class ConstantMemoryExcelSpec extends FlatSpec with Matchers {
 
   "true" should "be true" in {
     true shouldBe true
   }
 
-  import EasyExcelJRuby._
+  import ConstantMemoryExcel._
 
   val sheet_name = "SHEET_NAME"
   val headers    = Array("A", "B", "C")
@@ -22,11 +23,11 @@ class EasyExcelJRubySpec extends FlatSpec with Matchers {
   implicit final def toCell(value: String): Cell = if (value.isEmpty) blankCell else stringCell(value)
   implicit final def toCell(value: Double): Cell = numericCell(value)
 
-  def newSheetPlz: ConstantMemorySheet = newSheet(sheet_name, headers)
-  def row(cells: Cell*): Array[Cell]   = cells.toArray
+  def newCMStPlz: ConstantMemoryState     = newSheet(sheet_name, headers)
+  def row(cells: Cell*): ListBuffer[Cell] = cells.to[ListBuffer]
 
   "EasyExcelJRuby#addRows" should "write a tmp CSV file" in {
-    var sheet = newSheetPlz
+    var cms = newCMStPlz
 
     val data: Array[Row] = Array(
       row("a0", "b0", 0),
@@ -34,14 +35,14 @@ class EasyExcelJRubySpec extends FlatSpec with Matchers {
       row("a2", "b2", 2),
     )
 
-    sheet = addRows(sheet, data, 0)
+    cms = addRows(cms, data, 0)
 
-    sheet.pages should not be empty
-    sheet.pages.forall(page => Files.exists(page.path)) shouldBe true
+    cms.pages should not be empty
+    cms.pages.forall(page => Files.exists(page.path)) shouldBe true
   }
 
   "EasyExcelJRuby#writeFile" should "write the xlsx file" in {
-    var sheet = newSheetPlz
+    var cms = newCMStPlz
 
     val data0: Array[Row] = Array(
       row("a0", "b0", 0),
@@ -61,21 +62,21 @@ class EasyExcelJRubySpec extends FlatSpec with Matchers {
       row("a22", "", 22),
     )
 
-    sheet = addRows(sheet, data2, 10)
-    sheet = addRows(sheet, data1, 20)
-    sheet = addRows(sheet, data0, 15)
+    cms = addRows(cms, data2, 10)
+    cms = addRows(cms, data1, 20)
+    cms = addRows(cms, data0, 15)
 
     val fileName = s"fileName-${new Date()}.xlsx"
 
-    writeFile(sheet, fileName)
+    writeFile(cms, fileName)
 
     new File(fileName).exists() shouldBe true
-    sheet.pages should not be empty
-    sheet.pages.forall(page => Files.exists(page.path)) shouldBe true
+    cms.pages should not be empty
+    cms.pages.forall(page => Files.exists(page.path)) shouldBe true
   }
 
   "EasyExcelJRuby#writeFileAndClean" should "write the xlsx file and delete tmp csv files" in {
-    var sheet = newSheetPlz
+    var cms = newCMStPlz
 
     val data0: Array[Row] = Array(
       row("a0", "b0", 0),
@@ -95,17 +96,17 @@ class EasyExcelJRubySpec extends FlatSpec with Matchers {
       row("a22", "", 22),
     )
 
-    sheet = addRows(sheet, data2, 0)
-    sheet = addRows(sheet, data1, 1)
-    sheet = addRows(sheet, data0, 2)
+    cms = addRows(cms, data2, 0)
+    cms = addRows(cms, data1, 1)
+    cms = addRows(cms, data0, 2)
 
     val fileName = s"fileName-${new Date()}.xlsx"
 
-    writeFileAndClean(sheet, fileName)
+    writeFileAndClean(cms, fileName)
 
     new File(fileName).exists() shouldBe true
-    sheet.pages should not be empty
-    sheet.pages.forall(page => Files.exists(page.path)) shouldBe false
+    cms.pages should not be empty
+    cms.pages.forall(page => Files.exists(page.path)) shouldBe false
   }
 
 }
