@@ -14,21 +14,12 @@ lazy val root =
   Project(id = "easy_excel_jruby", base = file("."))
     .settings(moduleName := "root")
     .settings(noPublishSettings: _*)
-    .aggregate(core, constantSpace)
-    .dependsOn(core, constantSpace)
+    .aggregate(core)
+    .dependsOn(core)
 
 lazy val core =
   project
     .settings(moduleName := "easy_excel_jruby")
-    .settings(
-      libraryDependencies ++= Seq(
-        "com.norbitltd" %% "spoiwo" % "1.4.1"
-      ) ++ testKitLibs
-    )
-
-lazy val constantSpace =
-  project
-    .settings(moduleName := "easy_excel_jruby_constant_space")
     .settings(
       libraryDependencies ++= Seq(
         "com.norbitltd" %% "spoiwo" % "1.4.1",
