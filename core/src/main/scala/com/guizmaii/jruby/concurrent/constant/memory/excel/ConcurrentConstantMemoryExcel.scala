@@ -107,8 +107,6 @@ object ConcurrentConstantMemoryExcel {
       cell.setCellStyle(headerStyle)
     }
 
-    sheet.flushRows()
-
     var rowIndex = 1 // `1` is because the row 0 is already written (header)
     cms.pages.foreach {
       case Page(_, path) =>
