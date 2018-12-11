@@ -1,4 +1,4 @@
-package com.guizmaii.jruby.constant.memory.excel
+package com.guizmaii.jruby.concurrent.constant.memory.excel
 
 import java.io.{File, FileOutputStream}
 import java.nio.file.{Files, Path}
@@ -46,14 +46,14 @@ private[excel] object Page {
   implicit final val ordering: Ordering[Page] = Ordering.by(_.index)
 }
 
-final case class ConstantMemoryState private[excel] (
+final case class ConcurrentConstantMemoryState private[excel] (
     sheetName: String,
     headerData: Array[String],
     tmpDirectory: File,
     pages: SortedSet[Page]
 )
 
-object ConstantMemoryExcel {
+object ConcurrentConstantMemoryExcel {
 
   import kantan.csv._
   import kantan.csv.ops._
@@ -66,21 +66,25 @@ object ConstantMemoryExcel {
 
   final def numericCell(value: Double): Cell = Cell.NumericCell(value)
 
-  final def newSheet(sheetName: String, headerValues: Array[String]): ConstantMemoryState =
-    ConstantMemoryState(
+  final def newSheet(sheetName: String, headerValues: Array[String]): ConcurrentConstantMemoryState =
+    ConcurrentConstantMemoryState(
       sheetName = WorkbookUtil.createSafeSheetName(sheetName),
       headerData = headerValues,
       tmpDirectory = Files.createTempDirectory(UUID.randomUUID().toString).toFile,
       pages = SortedSet.empty
     )
 
-  final def addRows(cms: ConstantMemoryState, pageData: Array[Row], pageIndex: Int): ConstantMemoryState = {
+  final def addRows(
+      cms: ConcurrentConstantMemoryState,
+      pageData: Array[Row],
+      pageIndex: Int
+  ): ConcurrentConstantMemoryState = {
     val file = java.io.File.createTempFile(UUID.randomUUID().toString, "csv", cms.tmpDirectory)
     file.writeCsv[Row](pageData, rfc)
     cms.copy(pages = cms.pages + Page(pageIndex, file.toPath))
   }
 
-  final def writeFile(cms: ConstantMemoryState, fileName: String): Unit = {
+  final def writeFile(cms: ConcurrentConstantMemoryState, fileName: String): Unit = {
     // We'll manually manage the `flush` to the hard drive.
     val wb    = new SXSSFWorkbook(-1)
     val sheet = wb.createSheet(cms.sheetName)
@@ -136,14 +140,14 @@ object ConstantMemoryExcel {
     ()
   }
 
-  final def clean(sheet: ConstantMemoryState, swallowIOExceptions: Boolean = false): Unit = {
+  final def clean(sheet: ConcurrentConstantMemoryState, swallowIOExceptions: Boolean = false): Unit = {
     import better.files._ // better-files `delete()` method also works on directories, unlike the Java one.
     sheet.tmpDirectory.toScala.delete(swallowIOExceptions)
     ()
   }
 
   final def writeFileAndClean(
-      sheet: ConstantMemoryState,
+      sheet: ConcurrentConstantMemoryState,
       fileName: String,
       swallowIOExceptions: Boolean = false
   ): Unit = {

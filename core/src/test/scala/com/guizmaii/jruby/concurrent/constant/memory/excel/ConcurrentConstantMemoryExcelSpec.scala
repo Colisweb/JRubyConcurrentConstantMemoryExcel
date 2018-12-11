@@ -1,4 +1,4 @@
-package com.guizmaii.jruby.constant.memory.excel
+package com.guizmaii.jruby.concurrent.constant.memory.excel
 
 import java.io.File
 import java.nio.file.Files
@@ -8,13 +8,13 @@ import org.scalatest.{FlatSpec, Matchers}
 
 import scala.collection.mutable.ListBuffer
 
-class ConstantMemoryExcelSpec extends FlatSpec with Matchers {
+class ConcurrentConstantMemoryExcelSpec extends FlatSpec with Matchers {
 
   "true" should "be true" in {
     true shouldBe true
   }
 
-  import ConstantMemoryExcel._
+  import ConcurrentConstantMemoryExcel._
 
   val sheet_name = "SHEET_NAME"
   val headers    = Array("A", "B", "C")
@@ -23,10 +23,10 @@ class ConstantMemoryExcelSpec extends FlatSpec with Matchers {
   implicit final def toCell(value: String): Cell = if (value.isEmpty) blankCell else stringCell(value)
   implicit final def toCell(value: Double): Cell = numericCell(value)
 
-  def newCMStPlz: ConstantMemoryState     = newSheet(sheet_name, headers)
-  def row(cells: Cell*): ListBuffer[Cell] = cells.to[ListBuffer]
+  def newCMStPlz: ConcurrentConstantMemoryState = newSheet(sheet_name, headers)
+  def row(cells: Cell*): ListBuffer[Cell]       = cells.to[ListBuffer]
 
-  "EasyExcelJRuby#addRows" should "write a tmp CSV file" in {
+  "ConcurrentConstantMemoryExcel#addRows" should "write a tmp CSV file" in {
     var cms = newCMStPlz
 
     val data: Array[Row] = Array(
@@ -41,7 +41,7 @@ class ConstantMemoryExcelSpec extends FlatSpec with Matchers {
     cms.pages.forall(page => Files.exists(page.path)) shouldBe true
   }
 
-  "EasyExcelJRuby#writeFile" should "write the xlsx file" in {
+  "ConcurrentConstantMemoryExcel#writeFile" should "write the xlsx file" in {
     var cms = newCMStPlz
 
     val data0: Array[Row] = Array(
@@ -75,7 +75,7 @@ class ConstantMemoryExcelSpec extends FlatSpec with Matchers {
     cms.pages.forall(page => Files.exists(page.path)) shouldBe true
   }
 
-  "EasyExcelJRuby#writeFileAndClean" should "write the xlsx file and delete tmp csv files" in {
+  "ConcurrentConstantMemoryExcel#writeFileAndClean" should "write the xlsx file and delete tmp csv files" in {
     var cms = newCMStPlz
 
     val data0: Array[Row] = Array(

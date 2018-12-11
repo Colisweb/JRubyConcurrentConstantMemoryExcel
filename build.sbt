@@ -4,7 +4,7 @@ ThisBuild / scalafmtOnCompile := true
 ThisBuild / scalafmtCheck := true
 ThisBuild / scalafmtSbtCheck := true
 
-lazy val projectName = "ConstantMemoryExcelJRuby"
+lazy val projectName = "JRubyConcurrentConstantMemoryExcel"
 
 lazy val testKitLibs = Seq(
   "org.scalacheck" %% "scalacheck" % "1.14.0",
@@ -31,7 +31,7 @@ lazy val core =
     .settings(moduleName := projectName)
     .settings(
       libraryDependencies ++= Seq(
-        "com.nrinaudo" %% "kantan.csv" % "0.5.0",
+        "com.nrinaudo"         %% "kantan.csv"   % "0.5.0",
         "com.github.pathikrit" %% "better-files" % "3.7.0"
       ) ++ poi ++ testKitLibs)
 
@@ -48,14 +48,14 @@ inThisBuild(
   List(
     credentials += Credentials(Path.userHome / ".bintray" / ".credentials"),
     licenses := Seq("MIT" -> url("http://opensource.org/licenses/MIT")),
-    homepage := Some(url("https://github.com/guizmaii/easy_excel_jruby")),
+    homepage := Some(url("https://github.com/guizmaii/JRubyConcurrentConstantMemoryExcel")),
     bintrayOrganization := Some("guizmaii"),
     bintrayReleaseOnPublish := true,
     publishMavenStyle := true,
     pomExtra := (
       <scm>
-        <url>git@github.com:guizmaii/easy_excel_jruby.git</url>
-        <connection>scm:git:git@github.com:guizmaii/easy_excel_jruby.git</connection>
+        <url>git@github.com:guizmaii/JRubyConcurrentConstantMemoryExcel.git</url>
+        <connection>scm:git:git@github.com:guizmaii/JRubyConcurrentConstantMemoryExcel.git</connection>
       </scm>
         <developers>
           <developer>
