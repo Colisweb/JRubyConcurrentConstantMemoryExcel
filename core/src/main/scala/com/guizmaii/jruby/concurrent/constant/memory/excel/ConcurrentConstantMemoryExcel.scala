@@ -4,6 +4,7 @@ import java.io.{File, FileOutputStream}
 import java.nio.file.{Files, Path}
 import java.util.UUID
 
+import com.guizmaii.jruby.concurrent.constant.memory.excel.utils.KantanExtension
 import kantan.csv.{CellDecoder, CellEncoder}
 import org.apache.poi.ss.usermodel._
 import org.apache.poi.ss.util.WorkbookUtil
@@ -58,7 +59,7 @@ object ConcurrentConstantMemoryExcel {
   import kantan.csv._
   import kantan.csv.ops._
 
-  private[excel] type Row = ListBuffer[Cell]
+  private[excel] type Row = Array[Cell]
 
   final val blankCell: Cell = Cell.BlankCell
 
@@ -79,6 +80,8 @@ object ConcurrentConstantMemoryExcel {
       pageData: Array[Row],
       pageIndex: Int
   ): ConcurrentConstantMemoryState = {
+    import KantanExtension.arrayEncoder
+
     val file = java.io.File.createTempFile(UUID.randomUUID().toString, "csv", cms.tmpDirectory)
     file.writeCsv[Row](pageData, rfc)
     cms.copy(pages = cms.pages + Page(pageIndex, file.toPath))
@@ -111,8 +114,8 @@ object ConcurrentConstantMemoryExcel {
     cms.pages.foreach {
       case Page(_, path) =>
         path
-          .unsafeReadCsv[ListBuffer, Row](rfc)
-          .foreach { rowData: Row =>
+          .unsafeReadCsv[ListBuffer, ListBuffer[Cell]](rfc)
+          .foreach { rowData =>
             val row = sheet.createRow(rowIndex)
             rowIndex += 1
 

@@ -6,8 +6,6 @@ import java.util.Date
 
 import org.scalatest.{FlatSpec, Matchers}
 
-import scala.collection.mutable.ListBuffer
-
 class ConcurrentConstantMemoryExcelSpec extends FlatSpec with Matchers {
 
   "true" should "be true" in {
@@ -24,7 +22,7 @@ class ConcurrentConstantMemoryExcelSpec extends FlatSpec with Matchers {
   implicit final def toCell(value: Double): Cell = numericCell(value)
 
   def newCMStPlz: ConcurrentConstantMemoryState = newSheet(sheet_name, headers)
-  def row(cells: Cell*): ListBuffer[Cell]       = cells.to[ListBuffer]
+  def row(cells: Cell*): Array[Cell]            = cells.toArray
 
   "ConcurrentConstantMemoryExcel#addRows" should "write a tmp CSV file" in {
     var cms = newCMStPlz
