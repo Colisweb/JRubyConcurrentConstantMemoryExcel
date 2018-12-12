@@ -31,7 +31,7 @@ lazy val core =
     .settings(moduleName := projectName)
     .settings(
       libraryDependencies ++= Seq(
-        "com.nrinaudo"         %% "kantan.csv"   % "0.5.0",
+        "com.github.tototoshi" %% "scala-csv" % "1.3.5",
         "com.github.pathikrit" %% "better-files" % "3.7.0"
       ) ++ poi ++ testKitLibs)
 

@@ -1,11 +1,10 @@
 package com.guizmaii.jruby.concurrent.constant.memory.excel
 
 import java.io.{File, FileOutputStream}
-import java.nio.file.{Files, Path}
+import java.nio.file.Files
 import java.util.UUID
 
-import com.guizmaii.jruby.concurrent.constant.memory.excel.utils.KantanExtension
-import kantan.csv.{CellDecoder, CellEncoder}
+import com.guizmaii.jruby.concurrent.constant.memory.excel.Cell.{BLANK_CELL, NUMERIC_CELL, STRING_CELL}
 import org.apache.poi.ss.usermodel._
 import org.apache.poi.ss.util.WorkbookUtil
 import org.apache.poi.xssf.streaming.SXSSFWorkbook
@@ -25,24 +24,15 @@ object Cell {
   private[excel] final val STRING_CELL  = 's'
   private[excel] final val NUMERIC_CELL = 'n'
 
-  private[excel] implicit final val encoder: CellEncoder[Cell] = {
+  private[excel] final val encoder: Cell => String = {
     case BlankCell          => s"$BLANK_CELL:"
     case StringCell(value)  => s"$STRING_CELL:$value"
     case NumericCell(value) => s"$NUMERIC_CELL:$value"
   }
 
-  private[excel] implicit final val decoder: CellDecoder[Cell] =
-    CellDecoder.fromUnsafe { s =>
-      val Array(cellType, data) = s.split(":", 2)
-      (cellType(0): @switch) match {
-        case BLANK_CELL   => Cell.BlankCell
-        case STRING_CELL  => Cell.StringCell(data)
-        case NUMERIC_CELL => Cell.NumericCell(data.toDouble)
-      }
-    }
 }
 
-final case class Page private[excel] (index: Int, path: Path)
+final case class Page private[excel] (index: Int, csvFile: File)
 private[excel] object Page {
   implicit final val ordering: Ordering[Page] = Ordering.by(_.index)
 }
@@ -56,10 +46,13 @@ final case class ConcurrentConstantMemoryState private[excel] (
 
 object ConcurrentConstantMemoryExcel {
 
-  import kantan.csv._
-  import kantan.csv.ops._
+  import com.github.tototoshi.csv._
 
   private[excel] type Row = Array[Cell]
+
+  private[excel] object Row {
+    final val encoder: Row => ListBuffer[String] = row => row.to[ListBuffer].map(Cell.encoder)
+  }
 
   final val blankCell: Cell = Cell.BlankCell
 
@@ -80,11 +73,14 @@ object ConcurrentConstantMemoryExcel {
       pageData: Array[Row],
       pageIndex: Int
   ): ConcurrentConstantMemoryState = {
-    import KantanExtension.arrayEncoder
+    val file   = java.io.File.createTempFile(UUID.randomUUID().toString, "csv", cms.tmpDirectory)
+    val writer = CSVWriter.open(file)
 
-    val file = java.io.File.createTempFile(UUID.randomUUID().toString, "csv", cms.tmpDirectory)
-    file.writeCsv[Row](pageData, rfc)
-    cms.copy(pages = cms.pages + Page(pageIndex, file.toPath))
+    for (row <- pageData) writer.writeRow(Row.encoder(row))
+
+    writer.close()
+
+    cms.copy(pages = cms.pages + Page(index = pageIndex, csvFile = file))
   }
 
   final def writeFile(cms: ConcurrentConstantMemoryState, fileName: String): Unit = {
@@ -112,9 +108,9 @@ object ConcurrentConstantMemoryExcel {
 
     var rowIndex = 1 // `1` is because the row 0 is already written (header)
     cms.pages.foreach {
-      case Page(_, path) =>
-        path
-          .unsafeReadCsv[ListBuffer, ListBuffer[Cell]](rfc)
+      case Page(_, file) =>
+        CSVReader
+          .open(file)
           .foreach { rowData =>
             val row = sheet.createRow(rowIndex)
             rowIndex += 1
@@ -122,10 +118,12 @@ object ConcurrentConstantMemoryExcel {
             for ((cellData, cellIndex) <- rowData.zipWithIndex) {
               val cell = row.createCell(cellIndex)
               cell.setCellStyle(commonCellStyle)
-              cellData match {
-                case Cell.BlankCell          => () // Already BLANK at cell creation
-                case Cell.StringCell(value)  => cell.setCellValue(value)
-                case Cell.NumericCell(value) => cell.setCellValue(value)
+
+              val Array(cellType, value) = cellData.split(":", 2)
+              (cellType(0): @switch) match {
+                case BLANK_CELL   => () // Already BLANK at cell creation
+                case STRING_CELL  => cell.setCellValue(value)
+                case NUMERIC_CELL => cell.setCellValue(value.toDouble)
               }
             }
           }

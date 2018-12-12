@@ -1,7 +1,6 @@
 package com.guizmaii.jruby.concurrent.constant.memory.excel
 
 import java.io.File
-import java.nio.file.Files
 import java.util.Date
 
 import org.scalatest.{FlatSpec, Matchers}
@@ -36,7 +35,7 @@ class ConcurrentConstantMemoryExcelSpec extends FlatSpec with Matchers {
     cms = addRows(cms, data, 0)
 
     cms.pages should not be empty
-    cms.pages.forall(page => Files.exists(page.path)) shouldBe true
+    cms.pages.forall(_.csvFile.exists()) shouldBe true
   }
 
   "ConcurrentConstantMemoryExcel#writeFile" should "write the xlsx file" in {
@@ -70,7 +69,7 @@ class ConcurrentConstantMemoryExcelSpec extends FlatSpec with Matchers {
 
     new File(fileName).exists() shouldBe true
     cms.pages should not be empty
-    cms.pages.forall(page => Files.exists(page.path)) shouldBe true
+    cms.pages.forall(_.csvFile.exists()) shouldBe true
   }
 
   "ConcurrentConstantMemoryExcel#writeFileAndClean" should "write the xlsx file and delete tmp csv files" in {
@@ -104,7 +103,7 @@ class ConcurrentConstantMemoryExcelSpec extends FlatSpec with Matchers {
 
     new File(fileName).exists() shouldBe true
     cms.pages should not be empty
-    cms.pages.forall(page => Files.exists(page.path)) shouldBe false
+    cms.pages.forall(_.csvFile.exists()) shouldBe false
   }
 
 }
