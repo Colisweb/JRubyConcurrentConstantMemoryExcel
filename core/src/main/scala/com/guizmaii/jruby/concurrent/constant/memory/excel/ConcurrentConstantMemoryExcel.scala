@@ -51,7 +51,7 @@ object ConcurrentConstantMemoryExcel {
   private[excel] type Row = Array[Cell]
 
   private[excel] object Row {
-    final val encoder: Row => ListBuffer[String] = row => row.to[ListBuffer].map(Cell.encoder)
+    final val encoder: Row => Array[String] = _.map(Cell.encoder)
   }
 
   final val blankCell: Cell = Cell.BlankCell
