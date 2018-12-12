@@ -92,9 +92,9 @@ object ConcurrentConstantMemoryExcel {
   ): Unit = {
     import KantanExtension.arrayEncoder
 
-    val file    = java.io.File.createTempFile(UUID.randomUUID().toString, "csv", atomicCms.get().tmpDirectory)
-    val newPage = Page(pageIndex, file.toPath)
-    val task    = Task(file.writeCsv[Row](computeRows, rfc))
+    val tmpCsvFile = java.io.File.createTempFile(UUID.randomUUID().toString, "csv", atomicCms.get().tmpDirectory)
+    val newPage    = Page(pageIndex, tmpCsvFile.toPath)
+    val task       = Task(tmpCsvFile.writeCsv[Row](computeRows, rfc))
 
     atomicCms.transform { cms =>
       cms.copy(pages = cms.pages + newPage, tasks = cms.tasks :+ task)
