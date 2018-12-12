@@ -4,6 +4,7 @@ import java.io.File
 import java.nio.file.Files
 import java.util.Date
 
+import monix.execution.atomic.Atomic
 import org.scalatest.{FlatSpec, Matchers}
 
 class ConcurrentConstantMemoryExcelSpec extends FlatSpec with Matchers {
@@ -21,11 +22,11 @@ class ConcurrentConstantMemoryExcelSpec extends FlatSpec with Matchers {
   implicit final def toCell(value: String): Cell = if (value.isEmpty) blankCell else stringCell(value)
   implicit final def toCell(value: Double): Cell = numericCell(value)
 
-  def newCMStPlz: ConcurrentConstantMemoryState = newSheet(sheet_name, headers)
-  def row(cells: Cell*): Array[Cell]            = cells.toArray
+  def newCMStPlz: Atomic[ConcurrentConstantMemoryState] = newSheet(sheet_name, headers)
+  def row(cells: Cell*): Array[Cell]                    = cells.toArray
 
   "ConcurrentConstantMemoryExcel#addRows" should "write a tmp CSV file" in {
-    var cms = newCMStPlz
+    val cms = newCMStPlz
 
     val data: Array[Row] = Array(
       row("a0", "b0", 0),
@@ -33,14 +34,13 @@ class ConcurrentConstantMemoryExcelSpec extends FlatSpec with Matchers {
       row("a2", "b2", 2),
     )
 
-    cms = addRows(cms, data, 0)
+    addRows(cms, data, 0)
 
-    cms.pages should not be empty
-    cms.pages.forall(page => Files.exists(page.path)) shouldBe true
+    cms.get().pages should not be empty
   }
 
   "ConcurrentConstantMemoryExcel#writeFile" should "write the xlsx file" in {
-    var cms = newCMStPlz
+    val cms = newCMStPlz
 
     val data0: Array[Row] = Array(
       row("a0", "b0", 0),
@@ -60,21 +60,21 @@ class ConcurrentConstantMemoryExcelSpec extends FlatSpec with Matchers {
       row("a22", "", 22),
     )
 
-    cms = addRows(cms, data2, 10)
-    cms = addRows(cms, data1, 20)
-    cms = addRows(cms, data0, 15)
+    addRows(cms, data2, 10)
+    addRows(cms, data1, 20)
+    addRows(cms, data0, 15)
 
     val fileName = s"fileName-${new Date()}.xlsx"
 
     writeFile(cms, fileName)
 
     new File(fileName).exists() shouldBe true
-    cms.pages should not be empty
-    cms.pages.forall(page => Files.exists(page.path)) shouldBe true
+    cms.get().pages should not be empty
+    cms.get().pages.forall(page => Files.exists(page.path)) shouldBe true
   }
 
   "ConcurrentConstantMemoryExcel#writeFileAndClean" should "write the xlsx file and delete tmp csv files" in {
-    var cms = newCMStPlz
+    val cms = newCMStPlz
 
     val data0: Array[Row] = Array(
       row("a0", "b0", 0),
@@ -94,17 +94,17 @@ class ConcurrentConstantMemoryExcelSpec extends FlatSpec with Matchers {
       row("a22", "", 22),
     )
 
-    cms = addRows(cms, data2, 0)
-    cms = addRows(cms, data1, 1)
-    cms = addRows(cms, data0, 2)
+    addRows(cms, data2, 0)
+    addRows(cms, data1, 1)
+    addRows(cms, data0, 2)
 
     val fileName = s"fileName-${new Date()}.xlsx"
 
     writeFileAndClean(cms, fileName)
 
     new File(fileName).exists() shouldBe true
-    cms.pages should not be empty
-    cms.pages.forall(page => Files.exists(page.path)) shouldBe false
+    cms.get().pages should not be empty
+    cms.get().pages.forall(page => Files.exists(page.path)) shouldBe false
   }
 
 }

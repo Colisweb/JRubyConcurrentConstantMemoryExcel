@@ -32,7 +32,8 @@ lazy val core =
     .settings(
       libraryDependencies ++= Seq(
         "com.nrinaudo"         %% "kantan.csv"   % "0.5.0",
-        "com.github.pathikrit" %% "better-files" % "3.7.0"
+        "com.github.pathikrit" %% "better-files" % "3.7.0",
+        "io.monix"             %% "monix"        % "3.0.0-RC2",
       ) ++ poi ++ testKitLibs)
 
 /**

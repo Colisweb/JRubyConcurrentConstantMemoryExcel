@@ -6,6 +6,9 @@ import java.util.UUID
 
 import com.guizmaii.jruby.concurrent.constant.memory.excel.utils.KantanExtension
 import kantan.csv.{CellDecoder, CellEncoder}
+import monix.eval.Task
+import monix.execution.Scheduler
+import monix.execution.atomic.Atomic
 import org.apache.poi.ss.usermodel._
 import org.apache.poi.ss.util.WorkbookUtil
 import org.apache.poi.xssf.streaming.SXSSFWorkbook
@@ -51,6 +54,7 @@ final case class ConcurrentConstantMemoryState private[excel] (
     sheetName: String,
     headerData: Array[String],
     tmpDirectory: File,
+    tasks: List[Task[Unit]],
     pages: SortedSet[Page]
 )
 
@@ -61,99 +65,118 @@ object ConcurrentConstantMemoryExcel {
 
   private[excel] type Row = Array[Cell]
 
+  private[this] implicit final val scheduler: Scheduler =
+    Scheduler.computation(name = "ConcurrentConstantMemoryExcel-computation")
+
   final val blankCell: Cell = Cell.BlankCell
 
   final def stringCell(value: String): Cell = Cell.StringCell(value)
 
   final def numericCell(value: Double): Cell = Cell.NumericCell(value)
 
-  final def newSheet(sheetName: String, headerValues: Array[String]): ConcurrentConstantMemoryState =
-    ConcurrentConstantMemoryState(
-      sheetName = WorkbookUtil.createSafeSheetName(sheetName),
-      headerData = headerValues,
-      tmpDirectory = Files.createTempDirectory(UUID.randomUUID().toString).toFile,
-      pages = SortedSet.empty
+  final def newSheet(sheetName: String, headerValues: Array[String]): Atomic[ConcurrentConstantMemoryState] =
+    Atomic(
+      ConcurrentConstantMemoryState(
+        sheetName = WorkbookUtil.createSafeSheetName(sheetName),
+        headerData = headerValues,
+        tmpDirectory = Files.createTempDirectory(UUID.randomUUID().toString).toFile,
+        tasks = List.empty,
+        pages = SortedSet.empty
+      )
     )
 
   final def addRows(
-      cms: ConcurrentConstantMemoryState,
-      pageData: Array[Row],
+      atomicCms: Atomic[ConcurrentConstantMemoryState],
+      computeRows: => Array[Row],
       pageIndex: Int
-  ): ConcurrentConstantMemoryState = {
+  ): Unit = {
     import KantanExtension.arrayEncoder
 
-    val file = java.io.File.createTempFile(UUID.randomUUID().toString, "csv", cms.tmpDirectory)
-    file.writeCsv[Row](pageData, rfc)
-    cms.copy(pages = cms.pages + Page(pageIndex, file.toPath))
+    atomicCms.transform { cms =>
+      val file = java.io.File.createTempFile(UUID.randomUUID().toString, "csv", atomicCms.get().tmpDirectory)
+      cms.copy(
+        pages = cms.pages + Page(pageIndex, file.toPath),
+        tasks = cms.tasks :+ Task(file.writeCsv[Row](computeRows, rfc))
+      )
+    }
   }
 
-  final def writeFile(cms: ConcurrentConstantMemoryState, fileName: String): Unit = {
-    // We'll manually manage the `flush` to the hard drive.
-    val wb    = new SXSSFWorkbook(-1)
-    val sheet = wb.createSheet(cms.sheetName)
+  final def writeFile(atomicCms: Atomic[ConcurrentConstantMemoryState], fileName: String): Unit = {
+    val cms = atomicCms.get()
 
-    val font = new XSSFFont()
-    font.setBold(true)
+    def doWrite(): Unit = {
+      // We'll manually manage the `flush` to the hard drive.
+      val wb    = new SXSSFWorkbook(-1)
+      val sheet = wb.createSheet(cms.sheetName)
 
-    val headerStyle = wb.createCellStyle()
-    headerStyle.setAlignment(HorizontalAlignment.CENTER)
-    headerStyle.setShrinkToFit(true)
-    headerStyle.setFont(font)
+      val font = new XSSFFont()
+      font.setBold(true)
 
-    val commonCellStyle: CellStyle = wb.createCellStyle()
-    commonCellStyle.setShrinkToFit(true)
+      val headerStyle = wb.createCellStyle()
+      headerStyle.setAlignment(HorizontalAlignment.CENTER)
+      headerStyle.setShrinkToFit(true)
+      headerStyle.setFont(font)
 
-    val header = sheet.createRow(0)
-    for ((celldata, cellIndex) <- cms.headerData.zipWithIndex) {
-      val cell = header.createCell(cellIndex)
-      cell.setCellValue(celldata)
-      cell.setCellStyle(headerStyle)
-    }
+      val commonCellStyle: CellStyle = wb.createCellStyle()
+      commonCellStyle.setShrinkToFit(true)
 
-    var rowIndex = 1 // `1` is because the row 0 is already written (header)
-    cms.pages.foreach {
-      case Page(_, path) =>
-        path
-          .unsafeReadCsv[ListBuffer, ListBuffer[Cell]](rfc)
-          .foreach { rowData =>
-            val row = sheet.createRow(rowIndex)
-            rowIndex += 1
+      val header = sheet.createRow(0)
+      for ((celldata, cellIndex) <- cms.headerData.zipWithIndex) {
+        val cell = header.createCell(cellIndex)
+        cell.setCellValue(celldata)
+        cell.setCellStyle(headerStyle)
+      }
 
-            for ((cellData, cellIndex) <- rowData.zipWithIndex) {
-              val cell = row.createCell(cellIndex)
-              cell.setCellStyle(commonCellStyle)
-              cellData match {
-                case Cell.BlankCell          => () // Already BLANK at cell creation
-                case Cell.StringCell(value)  => cell.setCellValue(value)
-                case Cell.NumericCell(value) => cell.setCellValue(value)
+      var rowIndex = 1 // `1` is because the row 0 is already written (header)
+      cms.pages.foreach {
+        case Page(_, path) =>
+          path
+            .unsafeReadCsv[ListBuffer, ListBuffer[Cell]](rfc)
+            .foreach { rowData =>
+              val row = sheet.createRow(rowIndex)
+              rowIndex += 1
+
+              for ((cellData, cellIndex) <- rowData.zipWithIndex) {
+                val cell = row.createCell(cellIndex)
+                cell.setCellStyle(commonCellStyle)
+                cellData match {
+                  case Cell.BlankCell          => () // Already BLANK at cell creation
+                  case Cell.StringCell(value)  => cell.setCellValue(value)
+                  case Cell.NumericCell(value) => cell.setCellValue(value)
+                }
               }
             }
-          }
 
-        sheet.flushRows()
+          sheet.flushRows()
+      }
+
+      val out = new FileOutputStream(fileName)
+      wb.write(out)
+      out.close()
+
+      wb.dispose() // dispose of temporary files backing this workbook on disk
+      ()
     }
 
-    val out = new FileOutputStream(fileName)
-    wb.write(out)
-    out.close()
-
-    wb.dispose() // dispose of temporary files backing this workbook on disk
-    ()
+    Task
+      .gatherUnordered(cms.tasks)
+      .map(_ => doWrite())
+      .runSyncUnsafe()
   }
 
-  final def clean(sheet: ConcurrentConstantMemoryState, swallowIOExceptions: Boolean = false): Unit = {
+  final def clean(atomicCms: Atomic[ConcurrentConstantMemoryState], swallowIOExceptions: Boolean = false): Unit = {
     import better.files._ // better-files `delete()` method also works on directories, unlike the Java one.
-    sheet.tmpDirectory.toScala.delete(swallowIOExceptions)
+    atomicCms.get().tmpDirectory.toScala.delete(swallowIOExceptions)
     ()
   }
 
   final def writeFileAndClean(
-      sheet: ConcurrentConstantMemoryState,
+      atomicCms: Atomic[ConcurrentConstantMemoryState],
       fileName: String,
       swallowIOExceptions: Boolean = false
   ): Unit = {
-    writeFile(sheet, fileName)
-    clean(sheet, swallowIOExceptions)
+    writeFile(atomicCms, fileName)
+    clean(atomicCms, swallowIOExceptions)
   }
 
 }
