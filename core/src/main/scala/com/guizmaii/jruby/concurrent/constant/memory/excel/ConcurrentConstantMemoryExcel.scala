@@ -158,25 +158,18 @@ object ConcurrentConstantMemoryExcel {
       ()
     }
 
+    // TODO: Expose the `swallowIOExceptions` parameter in the `writeFile` function ?
+    def clean(swallowIOExceptions: Boolean = false): Unit = {
+      import better.files._ // better-files `delete()` method also works on directories, unlike the Java one.
+      cms.tmpDirectory.toScala.delete(swallowIOExceptions)
+      ()
+    }
+
     Task
       .gatherUnordered(cms.tasks)
       .map(_ => doWrite())
+      .map(_ => clean())
       .runSyncUnsafe()
-  }
-
-  final def clean(atomicCms: Atomic[ConcurrentConstantMemoryState], swallowIOExceptions: Boolean = false): Unit = {
-    import better.files._ // better-files `delete()` method also works on directories, unlike the Java one.
-    atomicCms.get().tmpDirectory.toScala.delete(swallowIOExceptions)
-    ()
-  }
-
-  final def writeFileAndClean(
-      atomicCms: Atomic[ConcurrentConstantMemoryState],
-      fileName: String,
-      swallowIOExceptions: Boolean = false
-  ): Unit = {
-    writeFile(atomicCms, fileName)
-    clean(atomicCms, swallowIOExceptions)
   }
 
 }
