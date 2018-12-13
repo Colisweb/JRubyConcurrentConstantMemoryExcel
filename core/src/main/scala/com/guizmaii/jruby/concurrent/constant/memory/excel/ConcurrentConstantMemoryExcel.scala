@@ -168,7 +168,7 @@ object ConcurrentConstantMemoryExcel {
     Task
       .gatherUnordered(cms.tasks)
       .map(_ => doWrite())
-      //.map(_ => clean())
+      .map(_ => clean())
       .runSyncUnsafe()
   }
 
