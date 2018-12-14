@@ -106,7 +106,7 @@ If your program OOM, the only way to fix that is by reducing the size of the res
 CPU usage considerations
 -------------------------
 
-Because this lib knows nothing about the compurations you'll ask it to execute, in order to maximise the CPU usage, 
+Because this lib knows nothing about the computations you'll ask it to execute, in order to maximise the CPU usage, 
 and so the speed of your Excel extractions, you'll have to ensure that the number of registered computations (number of call to the `addRows` function)
 is superior or equal to the number of cores your CPU has.
 
