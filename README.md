@@ -14,8 +14,7 @@ It can be used in Scala programs, of course, but there're better, pure, ways wit
 It's a very opinionated librairy which does not provides you all the possible customizations.    
 For example, it'll use all your CPU cores to compute the rows, it's not configurable and will maybe never be.
 
-Be sure to read and understand the [Heap usage considerations](https://github.com/Colisweb/JRubyConcurrentConstantMemoryExcel/tree/readme#heap-usage-considerations) 
-and [CPU usage considerations](https://github.com/Colisweb/JRubyConcurrentConstantMemoryExcel/tree/readme#hcpu-usage-considerations)
+Be sure to read and understand the [Heap usage considerations](#heap-usage-considerations) and [CPU usage considerations](#cpu-usage-considerations)
 before using this lib in a production environment.
 
 Installation
