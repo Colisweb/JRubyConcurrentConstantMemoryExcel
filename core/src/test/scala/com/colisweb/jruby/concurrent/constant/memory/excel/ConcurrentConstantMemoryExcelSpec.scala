@@ -22,7 +22,7 @@ class ConcurrentConstantMemoryExcelSpec extends FlatSpec with Matchers {
   implicit final def toCell(value: String): Cell = if (value.isEmpty) blankCell else stringCell(value)
   implicit final def toCell(value: Double): Cell = numericCell(value)
 
-  def newCMSPlz: Atomic[ConcurrentConstantMemoryState] = newSheet(sheet_name, headers)
+  def newCMSPlz: Atomic[ConcurrentConstantMemoryState] = newWorkbookState(sheet_name, headers)
   def row(cells: Cell*): Array[Cell]                   = cells.toArray
 
   "ConcurrentConstantMemoryExcel#addRows" should "write a tmp CSV file" in {
