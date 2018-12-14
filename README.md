@@ -106,3 +106,19 @@ Coding Style
 This project is a Scala librairy meant to be used in JRuby projects.
 
 *That explains the quite impure style used in the Scala code.*
+
+Acknowledgments
+---------------
+
+We want to thanks:
+
+ - Nicolas Rinaudo [@NicolasRinaudo](https://twitter.com/NicolasRinaudo)
+ - Elijah Rippeth [@terrible_coder](https://twitter.com/terrible_coder)
+ - Mathieu Besançon [@matbesancon](https://twitter.com/matbesancon)
+
+for their help in the writting of this lib.
+
+🙂
+
+
+ 
