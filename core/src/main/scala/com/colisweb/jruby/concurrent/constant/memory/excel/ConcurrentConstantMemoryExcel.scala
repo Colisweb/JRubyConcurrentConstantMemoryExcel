@@ -74,7 +74,7 @@ object ConcurrentConstantMemoryExcel {
 
   final def numericCell(value: Double): Cell = Cell.NumericCell(value)
 
-  final def newSheet(sheetName: String, headerValues: Array[String]): Atomic[ConcurrentConstantMemoryState] =
+  final def newWorkbookState(sheetName: String, headerValues: Array[String]): Atomic[ConcurrentConstantMemoryState] =
     Atomic(
       ConcurrentConstantMemoryState(
         sheetName = WorkbookUtil.createSafeSheetName(sheetName),
