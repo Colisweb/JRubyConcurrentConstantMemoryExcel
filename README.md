@@ -113,7 +113,7 @@ is superior or equal to the number of cores your CPU has.
 If it's inferior to that number, maybe you can write your `queries` in a different way.
 
 For example, instead of making 4 `query` each computing `1000` rows, you can write 8 `query` computing `500` rows.   
-On a 8 cores machines, the result can be computed up to 2 times faster in the case.
+On a 8 cores machines, the result can be computed up to 2 times faster in this case.
 
 Coding Style
 ------------
