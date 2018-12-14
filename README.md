@@ -82,7 +82,7 @@ queries.each_with_index { |query, index|
   
 }
 
-# Computations of rows will really begins with this call. Not before.
+# Computations of rows will really begin with this function call. Not before.
 # 
 ConcurrentConstantMemoryExcel.writeFile(workbook_state, "path/to/my/file") # will write a file named `file.xlsx in the `path/to/my` directory.
 ```
