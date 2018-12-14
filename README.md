@@ -104,7 +104,7 @@ So the maximum quantity of RAM this lib can use is equal to `n` times the quanti
 
 If your program OOM, the only way to fix that is by reducing the size of the result the `query` passed to the `parametrized_compute_rows_lambda` gives you.
 
-Heap usage considerations
+CPU usage considerations
 -------------------------
 
 Because this lib knows nothing about the compurations you'll ask it to execute, in order to maximise the CPU usage, 
