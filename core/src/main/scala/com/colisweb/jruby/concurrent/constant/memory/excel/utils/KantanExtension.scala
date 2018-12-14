@@ -1,4 +1,4 @@
-package com.guizmaii.jruby.concurrent.constant.memory.excel.utils
+package com.colisweb.jruby.concurrent.constant.memory.excel.utils
 
 import kantan.csv.{CellEncoder, RowEncoder}
 

@@ -1,4 +1,4 @@
-package com.guizmaii.jruby.concurrent.constant.memory.excel
+package com.colisweb.jruby.concurrent.constant.memory.excel
 
 import java.io.File
 import java.nio.file.Files

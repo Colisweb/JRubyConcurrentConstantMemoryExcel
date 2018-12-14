@@ -1,4 +1,4 @@
-ThisBuild / organization := "com.guizmaii"
+ThisBuild / organization := "com.colisweb"
 ThisBuild / scalaVersion := "2.12.8"
 ThisBuild / scalafmtOnCompile := true
 ThisBuild / scalafmtCheck := true
@@ -49,14 +49,14 @@ inThisBuild(
   List(
     credentials += Credentials(Path.userHome / ".bintray" / ".credentials"),
     licenses := Seq("MIT" -> url("http://opensource.org/licenses/MIT")),
-    homepage := Some(url("https://github.com/guizmaii/JRubyConcurrentConstantMemoryExcel")),
-    bintrayOrganization := Some("guizmaii"),
+    homepage := Some(url("https://github.com/colisweb/JRubyConcurrentConstantMemoryExcel")),
+    bintrayOrganization := Some("colisweb"),
     bintrayReleaseOnPublish := true,
     publishMavenStyle := true,
     pomExtra := (
       <scm>
-        <url>git@github.com:guizmaii/JRubyConcurrentConstantMemoryExcel.git</url>
-        <connection>scm:git:git@github.com:guizmaii/JRubyConcurrentConstantMemoryExcel.git</connection>
+        <url>git@github.com:colisweb/JRubyConcurrentConstantMemoryExcel.git</url>
+        <connection>scm:git:git@github.com:colisweb/JRubyConcurrentConstantMemoryExcel.git</connection>
       </scm>
         <developers>
           <developer>

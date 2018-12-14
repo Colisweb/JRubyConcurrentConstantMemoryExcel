@@ -1,10 +1,10 @@
-package com.guizmaii.jruby.concurrent.constant.memory.excel
+package com.colisweb.jruby.concurrent.constant.memory.excel
 
 import java.io.{File, FileOutputStream}
 import java.nio.file.{Files, Path}
 import java.util.UUID
 
-import com.guizmaii.jruby.concurrent.constant.memory.excel.utils.KantanExtension
+import com.colisweb.jruby.concurrent.constant.memory.excel.utils.KantanExtension
 import kantan.csv.{CellDecoder, CellEncoder}
 import monix.eval.Task
 import monix.execution.Scheduler
