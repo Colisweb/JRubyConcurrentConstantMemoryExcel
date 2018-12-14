@@ -8,7 +8,7 @@ Goal
 
 This librairy helps you to write Excel files (`xlsx`) as fast as possible without, hopefully, blowing your heap.
 
-It's meant to be used in JRuby programs.
+It's meant to be used in JRuby programs.    
 It can be used in Scala programs, of course, but there're better, pure, ways with such language to achieve the same goal.
 
 It's a very opinionated librairy which does not provides you all the possible customizations.
