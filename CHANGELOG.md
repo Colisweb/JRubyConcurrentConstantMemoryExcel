@@ -6,6 +6,8 @@ More infos about this file : http://keepachangelog.com/
 
 ## [Unreleased] - no_due_date
 
+## [v1.0.0] - 2018.12.14
+
 - **Write the README**
 
 ## [v0.0.7] - 2018.12.14
