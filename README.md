@@ -97,7 +97,7 @@ This librairy parallelizes the computations of your rows using `n` threads, wher
 
 For each call to the `addRows` function, a computation is registered in the `workbook_state`.
 
-When the `writeFile` function is called, all the registered computation will be launched, `n` by `n`.
+When the `writeFile` function is called, all the registered computations will be launched, `n` by `n`.
 
 So the maximum quantity of RAM this lib can use is equal to `n` times the quantity of RAM required to compute the `compute_rows_lambda`.
 
