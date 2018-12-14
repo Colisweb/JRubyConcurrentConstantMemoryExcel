@@ -101,7 +101,7 @@ When the `writeFile` function is called, all the registered computation will be 
 
 So the maximum quantity of RAM this lib can use is equal to `n` times the quantity of RAM required to compute the `compute_rows_lambda`.
 
-If your program OOM, the only way to fix that is by reducing the size of the result the `query` passed to the `parametrized_compute_rows_lambda` gives you.
+If your program OOM, the only way to fix that is by reducing the size of the result the `query` passed to the `parametrized_compute_rows_lambda` gives you when executed.
 
 CPU usage considerations
 -------------------------
