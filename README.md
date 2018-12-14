@@ -14,6 +14,10 @@ It can be used in Scala programs, of course, but there're better, pure, ways wit
 It's a very opinionated librairy which does not provides you all the possible customizations.    
 For example, it'll use all your CPU cores to compute the rows, it's not configurable and will maybe never be.
 
+Be sure to read and understand the [Heap usage considerations](https://github.com/Colisweb/JRubyConcurrentConstantMemoryExcel/tree/readme#heap-usage-considerations) 
+and [CPU usage considerations](https://github.com/Colisweb/JRubyConcurrentConstantMemoryExcel/tree/readme#hcpu-usage-considerations)
+before using this lib in a production environment.
+
 Installation
 ------------
 
@@ -99,6 +103,18 @@ When the `writeFile` function is called, all the registered computation will be 
 So the maximum quantity of RAM this lib can use is equal to `n` times the quantity of RAM required to compute the `compute_rows_lambda`.
 
 If your program OOM, the only way to fix that is by reducing the size of the result the `query` passed to the `parametrized_compute_rows_lambda` gives you.
+
+Heap usage considerations
+-------------------------
+
+Because this lib knows nothing about the compurations you'll ask it to execute, in order to maximise the CPU usage, 
+and so the speed of your Excel extractions, you'll have to ensure that the number of registered computations (number of call to the `addRows` function)
+is superior or equal to the number of cores your CPU has.
+
+If it's inferior to that number, maybe you can write your `queries` in a different way.
+
+For example, instead of making 4 `query` each computing `1000` rows, you can write 8 `query` computing `500` rows.
+On a 8 cores machines, the result Excel can be computing up to 2 times faster in the case.
 
 Coding Style
 ------------
