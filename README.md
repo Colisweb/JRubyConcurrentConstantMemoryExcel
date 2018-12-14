@@ -25,7 +25,7 @@ In your `Jarfile`:
 ```ruby
 source 'https://dl.bintray.com/colisweb/maven'
 
-jar 'com.colisweb:JRubyConcurrentConstantMemoryExcel_2.12', '1.0.0'
+jar 'com.colisweb:JRubyConcurrentConstantMemoryExcel_2.12', '0.0.7'
 ```
 
 Usage
@@ -130,6 +130,7 @@ We want to thanks:
  - Nicolas Rinaudo [@NicolasRinaudo](https://twitter.com/NicolasRinaudo)
  - Elijah Rippeth [@terrible_coder](https://twitter.com/terrible_coder)
  - Mathieu Besançon [@matbesancon](https://twitter.com/matbesancon)
+ - Charles Oliver Nutter [@headius](https://twitter.com/headius)
 
 for their help in the writting of this lib.
 
