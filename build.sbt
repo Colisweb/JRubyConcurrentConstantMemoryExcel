@@ -1,8 +1,10 @@
-ThisBuild / organization := "com.guizmaii"
+ThisBuild / organization := "com.colisweb"
 ThisBuild / scalaVersion := "2.12.8"
 ThisBuild / scalafmtOnCompile := true
 ThisBuild / scalafmtCheck := true
 ThisBuild / scalafmtSbtCheck := true
+
+lazy val projectName = "JRubyConcurrentConstantMemoryExcel"
 
 lazy val testKitLibs = Seq(
   "org.scalacheck" %% "scalacheck" % "1.14.0",
@@ -10,8 +12,15 @@ lazy val testKitLibs = Seq(
   "org.scalatest"  %% "scalatest"  % "3.0.5",
 ).map(_ % Test)
 
+lazy val poi =
+  ((version: String) =>
+    Seq(
+      "org.apache.poi" % "poi"       % version,
+      "org.apache.poi" % "poi-ooxml" % version
+    ))("4.0.1")
+
 lazy val root =
-  Project(id = "easy_excel_jruby", base = file("."))
+  Project(id = projectName, base = file("."))
     .settings(moduleName := "root")
     .settings(noPublishSettings: _*)
     .aggregate(core)
@@ -19,19 +28,18 @@ lazy val root =
 
 lazy val core =
   project
-    .settings(moduleName := "easy_excel_jruby")
+    .settings(moduleName := projectName)
     .settings(
       libraryDependencies ++= Seq(
-        "com.norbitltd" %% "spoiwo" % "1.4.1",
-        "com.nrinaudo" %% "kantan.csv" % "0.5.0",
-        "com.github.pathikrit" %% "better-files" % "3.7.0"
-      ) ++ testKitLibs
-    )
+        "com.nrinaudo"         %% "kantan.csv"   % "0.5.0",
+        "com.github.pathikrit" %% "better-files" % "3.7.0",
+        "io.monix"             %% "monix"        % "3.0.0-RC2",
+      ) ++ poi ++ testKitLibs)
 
 /**
   * Copied from Cats
   */
-def noPublishSettings = Seq(
+lazy val noPublishSettings = Seq(
   publish := {},
   publishLocal := {},
   publishArtifact := false
@@ -41,14 +49,14 @@ inThisBuild(
   List(
     credentials += Credentials(Path.userHome / ".bintray" / ".credentials"),
     licenses := Seq("MIT" -> url("http://opensource.org/licenses/MIT")),
-    homepage := Some(url("https://github.com/guizmaii/easy_excel_jruby")),
-    bintrayOrganization := Some("guizmaii"),
+    homepage := Some(url("https://github.com/colisweb/JRubyConcurrentConstantMemoryExcel")),
+    bintrayOrganization := Some("colisweb"),
     bintrayReleaseOnPublish := true,
     publishMavenStyle := true,
     pomExtra := (
       <scm>
-        <url>git@github.com:guizmaii/easy_excel_jruby.git</url>
-        <connection>scm:git:git@github.com:guizmaii/easy_excel_jruby.git</connection>
+        <url>git@github.com:colisweb/JRubyConcurrentConstantMemoryExcel.git</url>
+        <connection>scm:git:git@github.com:colisweb/JRubyConcurrentConstantMemoryExcel.git</connection>
       </scm>
         <developers>
           <developer>
