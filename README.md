@@ -93,7 +93,7 @@ ConcurrentConstantMemoryExcel.writeFile(workbook_state, "path/to/my/file") # wil
 Heap usage considerations
 -------------------------
 
-This librairy parallelizes the computation of your rows using `n` threads, where `n` is the number of cores your CPU has.
+This librairy parallelizes the computations of your rows using `n` threads, where `n` is the number of cores your CPU has.
 
 For each call to the `addRows` function, a computation is registered in the `workbook_state`.
 
