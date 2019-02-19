@@ -19,6 +19,13 @@ lazy val poi =
       "org.apache.poi" % "poi-ooxml" % version
     ))("4.0.1")
 
+lazy val monix =
+  ((version: String) =>
+    Seq(
+      "io.monix" %% "monix-execution" % version,
+      "io.monix" %% "monix-eval"      % version,
+    ))("3.0.0-RC2")
+
 lazy val root =
   Project(id = projectName, base = file("."))
     .settings(moduleName := "root")
@@ -33,8 +40,7 @@ lazy val core =
       libraryDependencies ++= Seq(
         "com.nrinaudo"         %% "kantan.csv"   % "0.5.0",
         "com.github.pathikrit" %% "better-files" % "3.7.0",
-        "io.monix"             %% "monix"        % "3.0.0-RC2",
-      ) ++ poi ++ testKitLibs)
+      ) ++ monix ++ poi ++ testKitLibs)
 
 /**
   * Copied from Cats

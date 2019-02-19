@@ -6,6 +6,8 @@ More infos about this file : http://keepachangelog.com/
 
 ## [Unreleased] - no_due_date
 
+- **Reduce the quantity of dependencies**
+
 ## [v1.0.0] - 2018.12.14
 
 - **Write the README**
