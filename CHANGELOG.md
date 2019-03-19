@@ -6,6 +6,8 @@ More infos about this file : http://keepachangelog.com/
 
 ## [Unreleased] - no_due_date
 
+- **Add OpenJDK11 in the Travis matrix**
+
 ## [v1.0.1] - 2019.02.19
 
 - **Reduce the quantity of dependencies**
