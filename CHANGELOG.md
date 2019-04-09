@@ -6,6 +6,10 @@ More infos about this file : http://keepachangelog.com/
 
 ## [Unreleased] - no_due_date
 
+- **Fix memory leak: Resources should be correctly closed**
+- **Add tests for non ASCII character (need to check the results manually)**
+- **Fix: long text police size should not change**
+- **Fix: Header should be bold**
 - **Add OpenJDK11 in the Travis matrix**
 
 ## [v1.0.1] - 2019.02.19
