@@ -103,7 +103,7 @@ class ConcurrentConstantMemoryExcelSpec extends FlatSpec with Matchers {
     val cms = newCMSPlz
 
     val data0: Array[Row] = Array(
-      row("éàç&ù$€£°"),
+      row("éàèç&ù$€£°"),
     )
 
     addRows(cms, data0, 0)
