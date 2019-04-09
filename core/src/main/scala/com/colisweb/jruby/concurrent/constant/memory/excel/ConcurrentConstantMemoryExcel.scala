@@ -12,7 +12,6 @@ import monix.execution.atomic.Atomic
 import org.apache.poi.ss.usermodel._
 import org.apache.poi.ss.util.WorkbookUtil
 import org.apache.poi.xssf.streaming.SXSSFWorkbook
-import org.apache.poi.xssf.usermodel.XSSFFont
 
 import scala.annotation.switch
 import scala.collection.immutable.SortedSet
@@ -109,20 +108,17 @@ object ConcurrentConstantMemoryExcel {
       val wb    = new SXSSFWorkbook(-1)
       val sheet = wb.createSheet(cms.sheetName)
 
-      val font = new XSSFFont()
-      font.setBold(true)
+      val boldFont = wb.createFont()
+      boldFont.setBold(true)
 
       val headerStyle = wb.createCellStyle()
       headerStyle.setAlignment(HorizontalAlignment.CENTER)
       headerStyle.setShrinkToFit(true)
-      headerStyle.setFont(font)
-
-      val commonCellStyle: CellStyle = wb.createCellStyle()
-      commonCellStyle.setShrinkToFit(true)
+      headerStyle.setFont(boldFont)
 
       val header = sheet.createRow(0)
       for ((celldata, cellIndex) <- cms.headerData.zipWithIndex) {
-        val cell = header.createCell(cellIndex)
+        val cell = header.createCell(cellIndex, CellType.STRING)
         cell.setCellValue(celldata)
         cell.setCellStyle(headerStyle)
       }
@@ -137,12 +133,10 @@ object ConcurrentConstantMemoryExcel {
               rowIndex += 1
 
               for ((cellData, cellIndex) <- rowData.zipWithIndex) {
-                val cell = row.createCell(cellIndex)
-                cell.setCellStyle(commonCellStyle)
                 cellData match {
-                  case Cell.BlankCell          => () // Already BLANK at cell creation
-                  case Cell.StringCell(value)  => cell.setCellValue(value)
-                  case Cell.NumericCell(value) => cell.setCellValue(value)
+                  case Cell.BlankCell          => row.createCell(cellIndex, CellType.BLANK)
+                  case Cell.StringCell(value)  => row.createCell(cellIndex, CellType.STRING).setCellValue(value)
+                  case Cell.NumericCell(value) => row.createCell(cellIndex, CellType.NUMERIC).setCellValue(value)
                 }
               }
             }

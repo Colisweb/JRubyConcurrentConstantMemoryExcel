@@ -8,8 +8,8 @@ lazy val projectName = "JRubyConcurrentConstantMemoryExcel"
 
 lazy val testKitLibs = Seq(
   "org.scalacheck" %% "scalacheck" % "1.14.0",
-  "org.scalactic"  %% "scalactic"  % "3.0.5",
-  "org.scalatest"  %% "scalatest"  % "3.0.5",
+  "org.scalactic"  %% "scalactic"  % "3.0.7",
+  "org.scalatest"  %% "scalatest"  % "3.0.7",
 ).map(_ % Test)
 
 lazy val poi =
@@ -17,7 +17,7 @@ lazy val poi =
     Seq(
       "org.apache.poi" % "poi"       % version,
       "org.apache.poi" % "poi-ooxml" % version
-    ))("4.0.1")
+    ))("4.1.0")
 
 lazy val monix =
   ((version: String) =>
@@ -39,7 +39,7 @@ lazy val core =
     .settings(
       libraryDependencies ++= Seq(
         "com.nrinaudo"         %% "kantan.csv"   % "0.5.0",
-        "com.github.pathikrit" %% "better-files" % "3.7.0",
+        "com.github.pathikrit" %% "better-files" % "3.7.1",
       ) ++ monix ++ poi ++ testKitLibs)
 
 /**
