@@ -85,15 +85,30 @@ class ConcurrentConstantMemoryExcelSpec extends FlatSpec with Matchers {
           |dq:snd;qs:dnqs;d;:qsn,dbq;,dbq,;dq
           |dqd:;sqnd,nqs:;snd;qsn;d,qnd,q,bfnqd;,alxeklfa:=sx;bgnfkaml=:fecklntuoijcmkxlgqchlekdjkr,lazjir xcgknfqxomcnq,ekjtln,fmnrljcn
           |epf,mdqle;tk""".stripMargin,
-        0
       ),
-      row("a1", "b1", 1),
-      row("a2", "b2", 2),
     )
 
     addRows(cms, data0, 0)
 
     val fileName = s"target/fileName-long-${new Date()}.xlsx"
+
+    writeFile(cms, fileName)
+
+    new File(fileName).exists() shouldBe true
+    cms.get().pages should not be empty
+    cms.get().pages.forall(page => Files.exists(page.path)) shouldBe false // clean the tmp CSV files automatically.
+  }
+
+  "ConcurrentConstantMemoryExcel#writeFile" should "keep the non ASCII character" in {
+    val cms = newCMSPlz
+
+    val data0: Array[Row] = Array(
+      row("éàç&ù$€£°"),
+    )
+
+    addRows(cms, data0, 0)
+
+    val fileName = s"target/fileName-non-ascii-${new Date()}.xlsx"
 
     writeFile(cms, fileName)
 
