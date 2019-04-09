@@ -4,6 +4,7 @@ import java.io.{File, FileOutputStream}
 import java.nio.file.{Files, Path}
 import java.util.UUID
 
+import cats.effect.Resource
 import com.colisweb.jruby.concurrent.constant.memory.excel.utils.KantanExtension
 import kantan.csv.{CellDecoder, CellEncoder}
 import monix.eval.Task
@@ -103,9 +104,7 @@ object ConcurrentConstantMemoryExcel {
   final def writeFile(atomicCms: Atomic[ConcurrentConstantMemoryState], fileName: String): Unit = {
     val cms = atomicCms.get()
 
-    def doWrite(): Unit = {
-      // We'll manually manage the `flush` to the hard drive.
-      val wb    = new SXSSFWorkbook(-1)
+    def computeWorkbookData(wb: SXSSFWorkbook): Task[Unit] = Task {
       val sheet = wb.createSheet(cms.sheetName)
 
       val boldFont = wb.createFont()
@@ -143,26 +142,39 @@ object ConcurrentConstantMemoryExcel {
 
           sheet.flushRows()
       }
-
-      val out = new FileOutputStream(fileName)
-      wb.write(out)
-      out.close()
-
-      wb.dispose() // dispose of temporary files backing this workbook on disk
-      ()
     }
 
     // TODO: Expose the `swallowIOExceptions` parameter in the `writeFile` function ?
-    def clean(swallowIOExceptions: Boolean = false): Unit = {
+    def clean(swallowIOExceptions: Boolean = false): Task[Unit] = Task {
       import better.files._ // better-files `delete()` method also works on directories, unlike the Java one.
       cms.tmpDirectory.toScala.delete(swallowIOExceptions)
       ()
     }
 
-    Task
-      .gatherUnordered(cms.tasks)
-      .map(_ => doWrite())
-      .map(_ => clean())
+    // Used as Resource to ease the clean of the temporary CSVs created during the tasks calcultation.
+    val computeIntermediateTmpCsvFiles: Resource[Task, Unit] =
+      Resource.make(Task.gatherUnordered(cms.tasks).flatMap(_ => Task.unit))(_ => clean())
+
+    val workbookResource: Resource[Task, SXSSFWorkbook] =
+      Resource.make {
+        // We'll manually manage the `flush` to the hard drive.
+        Task(new SXSSFWorkbook(-1))
+      } { wb: SXSSFWorkbook =>
+        Task {
+          wb.dispose() // dispose of temporary files backing this workbook on disk. Necessary because not done in the `close()`. See: https://stackoverflow.com/a/50363245
+          wb.close()
+        }
+      }
+
+    val fileOutputStreamResource: Resource[Task, FileOutputStream] =
+      Resource.make(Task(new FileOutputStream(fileName)))(out => Task(out.close()))
+
+    computeIntermediateTmpCsvFiles
+      .use { _ =>
+        workbookResource.use { wb =>
+          computeWorkbookData(wb).flatMap(_ => fileOutputStreamResource.use(out => Task(wb.write(out))))
+        }
+      }
       .runSyncUnsafe()
   }
 
