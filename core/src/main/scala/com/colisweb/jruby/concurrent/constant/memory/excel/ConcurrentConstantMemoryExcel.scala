@@ -106,13 +106,13 @@ object ConcurrentConstantMemoryExcel {
 
     def computeWorkbookData(wb: SXSSFWorkbook): Task[Unit] = Task {
       val sheet = wb.createSheet(cms.sheetName)
+      sheet.setDefaultColumnWidth(24)
 
       val boldFont = wb.createFont()
       boldFont.setBold(true)
 
       val headerStyle = wb.createCellStyle()
       headerStyle.setAlignment(HorizontalAlignment.CENTER)
-      headerStyle.setShrinkToFit(true)
       headerStyle.setFont(boldFont)
 
       val header = sheet.createRow(0)
