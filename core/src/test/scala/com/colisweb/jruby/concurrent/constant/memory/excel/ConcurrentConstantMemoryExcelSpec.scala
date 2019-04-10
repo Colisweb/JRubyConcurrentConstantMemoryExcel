@@ -73,4 +73,48 @@ class ConcurrentConstantMemoryExcelSpec extends FlatSpec with Matchers {
     cms.get().pages.forall(page => Files.exists(page.path)) shouldBe false // clean the tmp CSV files automatically.
   }
 
+  "ConcurrentConstantMemoryExcel#writeFile" should "not change the police size if the text is long" in {
+    val cms = newCMSPlz
+
+    val data0: Array[Row] = Array(
+      row(
+        """mqldnqs:;dn:q;nf;dqskdqshlfqldmqfnzlfnas:d,asqnf;q:dsd;nq:s;dnqs:;nd;qns:=:dkg;krgljz,q:snd:,;qs,:f:;qsfcsd v,sd ;fs,d;q:;sxqs;q s;cds;, vqd;s,cqs, q ;c
+          |qsdqsdqsjb,;qns;dqddqs:n;,dg;dnfsqd
+          |qsdq
+          |qsdqqs,;snd;q,ds:;qsnd:bq,bd;,qbd;,qbdn;sqbdq
+          |dq:snd;qs:dnqs;d;:qsn,dbq;,dbq,;dq
+          |dqd:;sqnd,nqs:;snd;qsn;d,qnd,q,bfnqd;,alxeklfa:=sx;bgnfkaml=:fecklntuoijcmkxlgqchlekdjkr,lazjir xcgknfqxomcnq,ekjtln,fmnrljcn
+          |epf,mdqle;tk""".stripMargin,
+      ),
+    )
+
+    addRows(cms, data0, 0)
+
+    val fileName = s"target/fileName-long-${new Date()}.xlsx"
+
+    writeFile(cms, fileName)
+
+    new File(fileName).exists() shouldBe true
+    cms.get().pages should not be empty
+    cms.get().pages.forall(page => Files.exists(page.path)) shouldBe false // clean the tmp CSV files automatically.
+  }
+
+  "ConcurrentConstantMemoryExcel#writeFile" should "keep the non ASCII character" in {
+    val cms = newCMSPlz
+
+    val data0: Array[Row] = Array(
+      row("éàèç&ù$€£°"),
+    )
+
+    addRows(cms, data0, 0)
+
+    val fileName = s"target/fileName-non-ascii-${new Date()}.xlsx"
+
+    writeFile(cms, fileName)
+
+    new File(fileName).exists() shouldBe true
+    cms.get().pages should not be empty
+    cms.get().pages.forall(page => Files.exists(page.path)) shouldBe false // clean the tmp CSV files automatically.
+  }
+
 }
