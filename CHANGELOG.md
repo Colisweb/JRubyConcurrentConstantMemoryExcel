@@ -6,6 +6,8 @@ More infos about this file : http://keepachangelog.com/
 
 ## [Unreleased] - no_due_date
 
+## [v1.0.2] - 2019.04.10
+
 - **Fix memory leak: Resources should be correctly closed**
 - **Add tests for non ASCII character (need to check the results manually)**
 - **Fix: long text police size should not change**
