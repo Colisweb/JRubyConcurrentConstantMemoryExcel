@@ -6,6 +6,8 @@ More infos about this file : http://keepachangelog.com/
 
 ## [Unreleased] - no_due_date
 
+## [v1.0.3] - 2019.04.26
+
 - **Try to fix non ASCII character**
 
 ## [v1.0.2] - 2019.04.10
