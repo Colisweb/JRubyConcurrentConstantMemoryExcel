@@ -8,7 +8,7 @@ More infos about this file : http://keepachangelog.com/
 
 ## [v1.0.4] - 2019.04.29
 
-- **Try to fix non ASCII character, BIS**
+- **Fix non ASCII characters handling**
 - **Rollback "Try to fix non ASCII character": it doesn't fix the problem.**
 
 ## [v1.0.3] - 2019.04.26
