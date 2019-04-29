@@ -17,9 +17,13 @@ import org.apache.poi.xssf.streaming.SXSSFWorkbook
 import scala.annotation.switch
 import scala.collection.immutable.SortedSet
 import scala.collection.mutable.ListBuffer
+import scala.io.Codec
 
 sealed abstract class Cell extends Product with Serializable
 object Cell {
+
+  private[this] implicit final val codec: Codec = Codec.UTF8
+
   private[excel] final case object BlankCell                 extends Cell
   private[excel] final case class StringCell(value: String)  extends Cell
   private[excel] final case class NumericCell(value: Double) extends Cell
@@ -62,9 +66,12 @@ object ConcurrentConstantMemoryExcel {
 
   import kantan.csv._
   import kantan.csv.ops._
+  // https://nrinaudo.github.io/kantan.csv/bom.html
+  import kantan.codecs.resource.bom._
 
   private[excel] type Row = Array[Cell]
 
+  private[this] implicit final val codec: Codec = Codec.UTF8
   private[this] implicit final val scheduler: Scheduler =
     Scheduler.computation(name = "ConcurrentConstantMemoryExcel-computation")
 

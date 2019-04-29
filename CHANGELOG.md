@@ -6,6 +6,7 @@ More infos about this file : http://keepachangelog.com/
 
 ## [Unreleased] - no_due_date
 
+- **Try to fix non ASCII character, BIS**
 - **Rollback "Try to fix non ASCII character": it doesn't fix the problem.**
 
 ## [v1.0.3] - 2019.04.26
