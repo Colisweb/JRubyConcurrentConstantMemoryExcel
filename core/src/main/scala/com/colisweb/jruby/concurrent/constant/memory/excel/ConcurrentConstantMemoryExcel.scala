@@ -21,9 +21,6 @@ import scala.io.Codec
 
 sealed abstract class Cell extends Product with Serializable
 object Cell {
-
-  private[this] implicit final val codec: Codec = Codec.UTF8
-
   private[excel] final case object BlankCell                 extends Cell
   private[excel] final case class StringCell(value: String)  extends Cell
   private[excel] final case class NumericCell(value: Double) extends Cell
