@@ -17,7 +17,6 @@ import org.apache.poi.xssf.streaming.SXSSFWorkbook
 import scala.annotation.switch
 import scala.collection.immutable.SortedSet
 import scala.collection.mutable.ListBuffer
-import org.apache.poi.common.usermodel.fonts.FontCharset
 
 sealed abstract class Cell extends Product with Serializable
 object Cell {
@@ -116,13 +115,6 @@ object ConcurrentConstantMemoryExcel {
       headerStyle.setAlignment(HorizontalAlignment.CENTER)
       headerStyle.setFont(boldFont)
 
-      val stringCellFont = wb.createFont()
-      stringCellFont.setBold(false)
-      stringCellFont.setCharSet(FontCharset.ANSI.getNativeId)
-
-      val stringCellStyle = wb.createCellStyle()
-      stringCellStyle.setFont(stringCellFont)
-
       val header = sheet.createRow(0)
       for ((celldata, cellIndex) <- cms.headerData.zipWithIndex) {
         val cell = header.createCell(cellIndex, CellType.STRING)
@@ -143,10 +135,7 @@ object ConcurrentConstantMemoryExcel {
                 cellData match {
                   case Cell.BlankCell          => row.createCell(cellIndex, CellType.BLANK)
                   case Cell.NumericCell(value) => row.createCell(cellIndex, CellType.NUMERIC).setCellValue(value)
-                  case Cell.StringCell(value) =>
-                    val cell = row.createCell(cellIndex, CellType.STRING)
-                    cell.setCellStyle(stringCellStyle)
-                    cell.setCellValue(value)
+                  case Cell.StringCell(value)  => row.createCell(cellIndex, CellType.STRING).setCellValue(value)
                 }
               }
             }
