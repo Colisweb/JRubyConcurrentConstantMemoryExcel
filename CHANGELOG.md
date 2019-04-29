@@ -6,6 +6,8 @@ More infos about this file : http://keepachangelog.com/
 
 ## [Unreleased] - no_due_date
 
+## [v1.0.4] - 2019.04.29
+
 - **Try to fix non ASCII character, BIS**
 - **Rollback "Try to fix non ASCII character": it doesn't fix the problem.**
 
