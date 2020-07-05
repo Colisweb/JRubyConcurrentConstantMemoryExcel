@@ -8,10 +8,10 @@ Goal
 
 This librairy helps you to write Excel files (`xlsx`) as fast as possible without, hopefully, blowing your heap.
 
-It's meant to be used in JRuby programs.    
+The lib is written in Scala but is meant to be used in JRuby programs.    
 It can be used in Scala programs, of course, but there're better, pure, ways with such language to achieve the same goal.
 
-It's a very opinionated librairy which does not provides you all the possible customizations.    
+It's a very opinionated librairy which does not provide you all the possible customizations.    
 For example, it'll use all your CPU cores to compute the rows, it's not configurable and will maybe never be.
 
 Be sure to read and understand the [heap usage considerations](#heap-usage-considerations) and [CPU usage considerations](#cpu-usage-considerations)
@@ -77,7 +77,7 @@ queries.each_with_index { |query, index|
 
   compute_rows_lambda = to_parametrize_compute_rows_lambda.call(query)
 
-  # Do not launch any computation. It just registers required computations in the `workbook_state`.
+  # This `addRows` function call do not launch any computation. It just registers required computations in the `workbook_state`.
   #
   # The second argument for this function call should be a lambda taking no parameter.   
   # 
@@ -85,7 +85,7 @@ queries.each_with_index { |query, index|
   
 }
 
-# Computations of rows will really begin with this function call. Not before.
+# The computation of rows will really begin with this function call. Not before.
 # 
 ConcurrentConstantMemoryExcel.writeFile(workbook_state, "path/to/my/file") # will write a file named `file.xlsx` in the `path/to/my` directory.
 ```
@@ -93,7 +93,7 @@ ConcurrentConstantMemoryExcel.writeFile(workbook_state, "path/to/my/file") # wil
 Heap usage considerations
 -------------------------
 
-This librairy parallelizes the computations of your rows using `n` threads, where `n` is the number of cores your CPU has.
+This librairy parallelizes the computation of your rows using `n` threads, where `n` is the number of cores your CPU has (the number of cores detected by the JVM, to be precise).
 
 For each call to the `addRows` function, a computation is registered in the `workbook_state`.
 
@@ -101,7 +101,7 @@ When the `writeFile` function is called, all the registered computations will be
 
 So the maximum quantity of RAM this lib can use is equal to `n` times the quantity of RAM required to compute the `compute_rows_lambda`.
 
-If your program OOM, the only way to fix that is by reducing the size of the result the `query` passed to the `parametrized_compute_rows_lambda` gives you when executed.
+If your program OOM, a way to fix that is by reducing the size of the result the `query` passed to the `parametrized_compute_rows_lambda` gives you when executed.
 
 CPU usage considerations
 -------------------------
