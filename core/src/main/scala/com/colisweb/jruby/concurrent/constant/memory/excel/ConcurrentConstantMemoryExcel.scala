@@ -157,7 +157,7 @@ object ConcurrentConstantMemoryExcel {
 
     // Used as a Resource to ease the clean of the temporary CSVs created during the tasks calcultation.
     val computeIntermediateTmpCsvFiles: Resource[Task, Unit] =
-      Resource.make(Task.gatherUnordered(cms.tasks).flatMap(_ => Task.unit))(_ => clean())
+      Resource.make(Task.parSequenceUnordered(cms.tasks).flatMap(_ => Task.unit))(_ => clean())
 
     val workbookResource: Resource[Task, SXSSFWorkbook] =
       Resource.make {

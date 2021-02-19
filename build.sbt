@@ -24,7 +24,7 @@ lazy val monix =
     Seq(
       "io.monix" %% "monix-execution" % version,
       "io.monix" %% "monix-eval"      % version,
-    ))("3.0.0-RC2")
+    ))("3.3.0")
 
 lazy val root =
   Project(id = projectName, base = file("."))
